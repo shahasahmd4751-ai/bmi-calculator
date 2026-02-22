@@ -1,0 +1,126 @@
+
+import streamlit as st
+
+# MUST be the first streamlit command
+st.set_page_config(
+    page_title="Bmi Calculator",
+    page_icon="💪",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Premium Dark Theme CSS
+css = """
+<style>
+    /* Dark Mode Global Styles */
+    .stApp {
+        background-color: #0e1117;
+        color: #ffffff;
+    }
+    
+    /* General text elements */
+    h1, h2, h3, p, span, label, .stMarkdown {
+        color: #ffffff !important;
+    }
+    
+    /* Metric styling */
+    [data-testid="stMetricValue"] {
+        color: #ff4b4b !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #bfbfbf !important;
+    }
+    
+    /* Card-like containers (streamlit groups) */
+    .stVerticalBlock > div > div > div[data-testid="stVerticalBlock"] {
+        background-color: #1e1e1e;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Slider colors */
+    .stSlider > div > div > div > div {
+        background-color: #ff4b4b !important;
+    }
+    
+    /* Tooltip and caption */
+    .stCaption {
+        color: #888888 !important;
+    }
+
+    /* Sidebar cleanup */
+    section[data-testid="stSidebar"] {
+        background-color: #161a24;
+    }
+</style>
+"""
+st.markdown(css, unsafe_allow_html=True)
+
+# Main Header
+st.title("💪 Bmi Calculator")
+st.markdown("### Precision Health Monitoring in Dark Mode")
+
+# Main Layout
+col1, col2 = st.columns([1, 1], gap="large")
+
+with col1:
+    st.subheader("📏 Your Measurements")
+    with st.container():
+        height = st.slider("Height (cm)", 100, 250, 175, help="Slide to your height")
+        weight = st.slider("Weight (kg)", 40, 200, 70, help="Slide to your weight")
+        
+    st.caption("ℹ️ BMI is a reliable indicator of body fatness for most people.")
+
+# BMI Calculation
+height_m = height / 100
+bmi = weight / (height_m ** 2)
+
+# Category Logic
+if bmi < 18.5:
+    category, color, message = "Underweight", "info", "Focus on nutrient-dense foods and healthy snacks."
+elif 18.5 <= bmi < 25:
+    category, color, message = "Healthy Weight", "success", "Excellent! Keep maintaining your current lifestyle."
+elif 25 <= bmi < 30:
+    category, color, message = "Overweight", "warning", "Consider increasing physical activity and monitoring diet."
+else:
+    category, color, message = "Obese", "error", "It is recommended to consult a healthcare professional."
+
+with col2:
+    st.subheader("📊 Analysis Results")
+    with st.container():
+        m_col1, m_col2 = st.columns(2)
+        m_col1.metric("Your BMI", f"{bmi:.1f}")
+        m_col2.metric("Category", category)
+        
+        # Progress Bar visualizer
+        progress_val = min(max((bmi - 10) / 30, 0.0), 1.0)
+        st.progress(progress_val)
+        
+        if color == "success": st.success(message)
+        elif color == "info": st.info(message)
+        elif color == "warning": st.warning(message)
+        else: st.error(message)
+
+# Footer Detail
+st.divider()
+row2_col1, row2_col2 = st.columns(2)
+
+with row2_col1:
+    st.markdown("### 💡 Healthy Range")
+    h_min = 18.5 * (height_m ** 2)
+    h_max = 24.9 * (height_m ** 2)
+    st.write(f"For your height, a healthy weight is between **{h_min:.1f} kg** and **{h_max:.1f} kg**.")
+
+with row2_col2:
+    st.markdown("### 📝 Recommendations")
+    st.write("Maintain a balanced diet and regular exercise. Results are for informational purposes.")
+
+st.divider()
+st.caption("Bmi Calculator Dark Edition | © 2026")
+
+
+
